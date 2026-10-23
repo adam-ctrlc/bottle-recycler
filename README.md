@@ -57,26 +57,33 @@ The servos must not be powered from the Arduino's 5V pin. They pull too much cur
 
 ## Uploading
 
-Open `bottle_recycler/bottle_recycler.ino` in the Arduino IDE, choose **Arduino Uno**, and click Upload.
+The Arduino IDE needs the folder to have the same name as the `.ino` file, so download it into a folder called `bottle_recycler`:
 
-Or with `arduino-cli`:
+```sh
+git clone https://github.com/adam-ctrlc/bottle-recycler.git bottle_recycler
+```
+
+If you use **Code → Download ZIP** instead, rename the unzipped folder to `bottle_recycler`.
+
+Then open `bottle_recycler.ino` in the Arduino IDE, choose **Arduino Uno**, and click Upload.
+
+Or with `arduino-cli`, from inside the folder:
 
 ```sh
 arduino-cli lib install hd44780
-arduino-cli compile --fqbn arduino:avr:uno bottle_recycler
-arduino-cli upload -p <your-port> --fqbn arduino:avr:uno bottle_recycler
+arduino-cli compile --fqbn arduino:avr:uno .
+arduino-cli upload -p <your-port> --fqbn arduino:avr:uno .
 ```
 
 ## Files
 
 | File | What's in it |
 |---|---|
-| `bottle_recycler/bottle_recycler.ino` | Main program and the LCD messages |
-| `bottle_recycler/config.h` | **All pins, angles and timings — change settings here** |
-| `bottle_recycler/display.h/.cpp` | LCD |
-| `bottle_recycler/sensor.h/.cpp` | TCRT5000 bottle sensor |
-| `bottle_recycler/servos.h/.cpp` | Coin servo and bottle servo |
-| `i2c_scanner/i2c_scanner.ino` | Tool that prints the address of every I2C device (Serial Monitor, 9600 baud) |
+| `bottle_recycler.ino` | Main program and the LCD messages |
+| `config.h` | **All pins, angles and timings — change settings here** |
+| `display.h/.cpp` | LCD |
+| `sensor.h/.cpp` | TCRT5000 bottle sensor |
+| `servos.h/.cpp` | Coin servo and bottle servo |
 
 ## Troubleshooting
 
@@ -86,4 +93,4 @@ arduino-cli upload -p <your-port> --fqbn arduino:avr:uno bottle_recycler
 | Fast bottles are missed | Mount the sensor 2–10 mm from where the bottle passes. Lower `MIN_DETECT_TIME` in `config.h`. |
 | LCD flickers / servos don't move | Power problem. Use the buck converter wiring above. |
 | LCD lights up but shows no text | Turn the contrast screw on the back of the LCD. |
-| LCD stays dark, onboard LED blinks | LCD not found. Check SDA/SCL wiring and run `i2c_scanner`. |
+| LCD stays dark, onboard LED blinks | LCD not found. Check the SDA, SCL, VCC and GND wires. |
