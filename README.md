@@ -30,7 +30,7 @@ The servos remember their last angle (saved in EEPROM), so after a power cut the
 | Servo 1 (coin) signal | D2 |
 | Servo 2 (bottle) signal | D3 |
 | TCRT5000 D0 | D4 |
-| LCD SDA / SCL | Uno SDA / SCL pins (next to AREF) |
+| LCD SDA / SCL | Uno pins labeled SDA / SCL |
 | LCD and TCRT5000 VCC / GND | Arduino 5V / GND |
 
 ### Power
