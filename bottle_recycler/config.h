@@ -6,7 +6,7 @@
 const int COIN_SERVO_PIN   = 2;  // servo 1: coin dispenser
 const int BOTTLE_SERVO_PIN = 3;  // servo 2: bottle flap/pusher
 const int SENSOR_PIN       = 4;  // TCRT5000 module "D0" output
-// LCD: SDA -> A4, SCL -> A5 (address is found automatically)
+// LCD: SDA -> Uno SDA, SCL -> Uno SCL (pins next to AREF; address is found automatically)
 
 // Most TCRT5000 modules pull D0 LOW when something is in front of the sensor.
 // If yours works the other way round, change this to HIGH.

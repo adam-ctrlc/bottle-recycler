@@ -31,7 +31,7 @@ void loop() {
   }
 
   if (found == 0) {
-    Serial.println("  No I2C devices found - check SDA (A4), SCL (A5), VCC and GND");
+    Serial.println("  No I2C devices found - check SDA, SCL, VCC and GND");
   } else {
     Serial.print("  Done, ");
     Serial.print(found);
