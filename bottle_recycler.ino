@@ -15,30 +15,42 @@
 #include "sensor.h"
 #include "servos.h"
 
-void setup() {
-  sensorBegin();
-  displayBegin();
-  showMessage("Hello!", "Getting ready...");
-  servosBegin();
-  showReady();
+void showReady() {
+  showMessage("Insert a bottle", "to get a coin");
 }
 
-void loop() {
-  if (!bottleDetected()) {
-    return;
+// Opens the flap until the sensor stops seeing the bottle, up to BOTTLE_TRIES
+// times. Returns true if the bottle went in.
+bool acceptBottle() {
+  for (int attempt = 1; attempt <= BOTTLE_TRIES; attempt++) {
+    if (attempt > 1) {
+      showMessage("One moment...", "Trying again");
+    }
+    takeBottle();
+    if (sensorClearWithin(BOTTLE_GONE_TIMEOUT)) {
+      return true;
+    }
   }
+  return false;
+}
 
+// Takes one bottle in and pays for it. The bottle is marked as pending the
+// whole time, so if the power goes off halfway the machine finishes it on
+// restart instead of losing the coin.
+void handleBottle() {
+  setBottlePending(true);
   showMessage("Bottle received!", "Please wait...");
-  takeBottle();
 
-  showMessage("Your coin is", "coming out...");
-  dispenseCoin();
-
-  showMessage("Thank you!", "Take your coin");
-  delay(THANK_YOU_TIME);
-
-  // Still blocked after all that means the bottle didn't go in
-  if (sensorBlocked()) {
+  if (acceptBottle()) {
+    showMessage("Your coin is", "coming out...");
+    dispenseCoin();  // clears the pending mark once the coin is out
+    displayReset();  // a servo move can scramble the screen through a power dip
+    showMessage("Thank you!", "Take your coin");
+    delay(THANK_YOU_TIME);
+  } else {
+    // No coin: the bottle never went in, or something is held in front of the sensor
+    setBottlePending(false);
+    displayReset();
     showMessage("Bottle is stuck", "Please remove it");
     waitForSensorClear();
   }
@@ -46,6 +58,21 @@ void loop() {
   showReady();
 }
 
-void showReady() {
-  showMessage("Insert a bottle", "to get a coin");
+void setup() {
+  sensorBegin();
+  displayBegin();
+  showMessage("Hello!", "Getting ready...");
+  servosBegin();
+
+  if (bottlePending()) {
+    handleBottle();  // the power went off in the middle of a bottle: finish it
+  } else {
+    showReady();
+  }
+}
+
+void loop() {
+  if (bottleDetected()) {
+    handleBottle();
+  }
 }

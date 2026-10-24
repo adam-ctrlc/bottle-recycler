@@ -3,5 +3,5 @@
 
 void sensorBegin();
 bool bottleDetected();
-bool sensorBlocked();
-void waitForSensorClear();
+bool sensorClearWithin(unsigned long timeout);  // true once nothing is seen for CLEAR_TIME in a row
+void waitForSensorClear();                      // waits as long as it takes

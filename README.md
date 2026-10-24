@@ -6,12 +6,22 @@ An Arduino machine that gives a coin for every plastic bottle. A TCRT5000 sensor
 
 1. The LCD shows **"Insert a bottle / to get a coin"**.
 2. The TCRT5000 sensor sees the bottle (even one rolling past quickly).
-3. Servo 2 opens the bottle flap (0° → 90° → 0°).
-4. Servo 1 turns 0° → 180° → 0° to push one coin out.
+3. Servo 2 opens the bottle flap (0° → 90° → 0°), then the machine checks that the bottle has left the sensor. If it hasn't, it tries again, up to 3 times.
+4. Only once the bottle is in, servo 1 turns 0° → 180° → 0° to push one coin out.
 5. The LCD shows **"Thank you! / Take your coin"**.
-6. If the bottle is still in front of the sensor, the LCD asks the user to remove it, so one bottle can't pay twice.
+6. If the bottle never goes in, the LCD shows **"Bottle is stuck / Please remove it"** and no coin is given.
 
-The servos remember their last angle (saved in EEPROM), so after a power cut they sweep slowly back to 0° instead of snapping.
+### Reliability
+
+- **Power cuts:** the machine saves what it's doing in EEPROM. If the power goes off after a bottle went in but before its coin came out, the coin comes out when it starts again. A cut after the coin is out can't pay a second one.
+- **Servo position:** each servo's angle is saved too, so after a power cut it moves back to 0° without swinging forward (which would push out an extra coin).
+- **Screen problems:** if the LCD stops answering, the machine keeps working, tries to restart the screen, and turns on the Arduino's onboard LED (L).
+- **I2C freeze:** a timeout stops noise on the LCD wires from freezing the Arduino.
+
+### Limits
+
+- The sensor can't tell a bottle from a hand, so a hand waved in front of it gets a coin.
+- The machine can't tell if the coin holder is empty.
 
 ## Parts
 
@@ -84,6 +94,17 @@ arduino-cli upload -p <your-port> --fqbn arduino:avr:uno .
 | `display.h/.cpp` | LCD |
 | `sensor.h/.cpp` | TCRT5000 bottle sensor |
 | `servos.h/.cpp` | Coin servo and bottle servo |
+| `test/` | Simulation that runs the sketch on a computer (see below) |
+
+## Tests
+
+`test/` runs the real sketch code on your computer with fake servos, sensor, EEPROM and LCD, and checks that the machine pays exactly the right number of coins in 12 situations: a bottle rolling past fast, a clear bottle flickering the sensor, a stuck bottle, a retry that frees it, power cuts at each step, leftover EEPROM data, a second bottle during "Thank you!", a missing LCD, and doing nothing.
+
+```sh
+sh test/run.sh
+```
+
+Needs a C++ compiler (on a Mac: `xcode-select --install`). The Arduino IDE ignores this folder, so it doesn't affect the sketch.
 
 ## Troubleshooting
 
@@ -93,4 +114,5 @@ arduino-cli upload -p <your-port> --fqbn arduino:avr:uno .
 | Fast bottles are missed | Mount the sensor 2–10 mm from where the bottle passes. Lower `MIN_DETECT_TIME` in `config.h`. |
 | LCD flickers / servos don't move | Power problem. Use the buck converter wiring above. |
 | LCD lights up but shows no text | Turn the contrast screw on the back of the LCD. |
-| LCD stays dark, onboard LED blinks | LCD not found. Check the SDA, SCL, VCC and GND wires. |
+| LCD stays dark and the onboard LED (L) is on | LCD not found. Check the SDA, SCL, VCC and GND wires. The machine still works without it. |
+| "Bottle is stuck" with no bottle there | The sensor is seeing the background. Turn its screw to make it less sensitive. |

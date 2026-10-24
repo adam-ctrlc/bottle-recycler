@@ -3,7 +3,9 @@
 #include "sensor.h"
 
 void sensorBegin() {
-  pinMode(SENSOR_PIN, INPUT);
+  // Pull-up: if the sensor wire comes loose, the pin reads "nothing there"
+  // (with the default SENSOR_DETECTED = LOW) instead of floating and faking bottles.
+  pinMode(SENSOR_PIN, INPUT_PULLUP);
 }
 
 // True if the sensor sees something for at least MIN_DETECT_TIME.
@@ -22,14 +24,27 @@ bool bottleDetected() {
   return false;
 }
 
-// True if something is still in front of the sensor right now
-bool sensorBlocked() {
-  return digitalRead(SENSOR_PIN) == SENSOR_DETECTED;
+// "Clear" means nothing seen for CLEAR_TIME in a row. A clear plastic bottle
+// can flicker the sensor off for a moment while it's still there, and a single
+// clear reading would let the same bottle be counted twice.
+bool sensorClearWithin(unsigned long timeout) {
+  unsigned long start = millis();
+  unsigned long clearSince = start;
+  while (millis() - start < timeout) {
+    if (digitalRead(SENSOR_PIN) == SENSOR_DETECTED) {
+      clearSince = millis();
+    } else if (millis() - clearSince >= CLEAR_TIME) {
+      return true;
+    }
+  }
+  return false;
 }
 
-// Don't pay twice for the same bottle: wait until the sensor is clear
 void waitForSensorClear() {
-  while (digitalRead(SENSOR_PIN) == SENSOR_DETECTED) {
-    delay(50);
+  unsigned long clearSince = millis();
+  while (millis() - clearSince < CLEAR_TIME) {
+    if (digitalRead(SENSOR_PIN) == SENSOR_DETECTED) {
+      clearSince = millis();
+    }
   }
 }

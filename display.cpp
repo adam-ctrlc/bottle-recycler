@@ -10,11 +10,19 @@ static const int LCD_ROWS = 2;
 static hd44780_I2Cexp lcd;  // finds the I2C address and backpack wiring by itself
 
 void displayBegin() {
-  int status = lcd.begin(LCD_COLS, LCD_ROWS);
-  if (status) {
-    // LCD not found: blinks the onboard LED (pin 13) with the error code
-    hd44780::fatalError(status);
-  }
+  // Without a timeout, noise on the I2C wires (e.g. from the servos) can make
+  // Wire wait forever and freeze the whole machine. With it, the LCD call just
+  // fails and the machine keeps working.
+  Wire.setWireTimeout(25000, true);
+  pinMode(LED_BUILTIN, OUTPUT);
+  displayReset();
+}
+
+// If the LCD isn't answering, the machine keeps running without it and the
+// Arduino's onboard LED stays on so you know the screen has a problem.
+void displayReset() {
+  bool ok = (lcd.begin(LCD_COLS, LCD_ROWS) == 0);
+  digitalWrite(LED_BUILTIN, ok ? LOW : HIGH);
 }
 
 static void printCentered(int row, const char *text) {
@@ -27,7 +35,11 @@ static void printCentered(int row, const char *text) {
 }
 
 void showMessage(const char *line1, const char *line2) {
-  lcd.clear();
+  // LCD stopped answering (loose wire, I2C glitch): start it again once
+  if (lcd.clear() != 0) {
+    displayReset();
+    lcd.clear();
+  }
   printCentered(0, line1);
   printCentered(1, line2);
 }

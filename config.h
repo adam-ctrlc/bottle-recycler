@@ -18,8 +18,13 @@ const int COIN_PUSH   = 180;
 const int BOTTLE_REST = 0;
 const int BOTTLE_OPEN = 90;
 
+// ---- Retries ----
+const int BOTTLE_TRIES = 3;  // flap attempts before showing "Bottle is stuck"
+
 // ---- Timing (ms) ----
 const unsigned long MIN_DETECT_TIME  = 5;    // a bottle only has to be seen this long, so fast ones still count
+const unsigned long CLEAR_TIME       = 300;  // sensor must see nothing this long in a row to count as clear
+const unsigned long BOTTLE_GONE_TIMEOUT = 1500; // after the flap closes, how long to wait for the sensor to clear (keep above CLEAR_TIME)
 const unsigned long BOTTLE_HOLD      = 1000; // time the bottle flap stays open
 const unsigned long COIN_HOLD        = 500;  // time the coin servo waits at 180
 const unsigned long SERVO_STEP_DELAY = 10;   // per degree; slower = less current = less brownout
