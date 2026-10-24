@@ -4,7 +4,7 @@ An Arduino machine that gives a coin for every plastic bottle. A TCRT5000 sensor
 
 | Front | Inside |
 |:---:|:---:|
-| <img src="images/front-labeled.jpg" alt="Front of the bottle recycler: bottle chute at the top left, screen at the top right, coin opening at the bottom right" width="360"> | <img src="images/inside.jpg" alt="Inside the bottle recycler: Arduino Uno, breadboard and wiring" width="480"> |
+| <img src="images/front-labeled.jpg" alt="Front of the bottle recycler: bottle chute at the top left, screen at the top right, coin opening at the bottom right" width="360"> | <img src="images/inside-labeled.jpg" alt="Inside the bottle recycler, seen from above: Arduino Uno and breadboard on a shelf, power plug, bottle chute, coin tube and the back of the LCD" width="480"> |
 
 ## How it works
 
