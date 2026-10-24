@@ -2,6 +2,10 @@
 
 An Arduino machine that gives a coin for every plastic bottle. A TCRT5000 sensor detects the bottle, one servo takes the bottle in, and a second servo pushes a coin out. A 16x2 I2C LCD tells the user what to do.
 
+| Front | Inside |
+|:---:|:---:|
+| <img src="images/front.jpg" alt="Front of the bottle recycler with the LCD lit" width="360"> | <img src="images/inside.jpg" alt="Inside the bottle recycler: Arduino Uno, breadboard and wiring" width="480"> |
+
 ## How it works
 
 1. The LCD shows **"Insert a bottle / to get a coin"**.
